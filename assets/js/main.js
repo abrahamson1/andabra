@@ -46,11 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Visualization 3: Highest and Lowest Levels of Air Pollution
         const pollutants = ["Carbon_Monoxide","PM2.5", "Ozone", "Nitrogen_dioxide", "Sulphur_dioxide", 'PM10'];
-        const maxMinData = pollutants.map(pollutant => ({
-            pollutant,
-            max: d3.max(data, d => +d[`air_quality_${pollutant}`]),
-            min: d3.min(data, d => +d[`air_quality_${pollutant}`]),
-        }));
+        const maxMinData = pollutants.map(pollutant => {
+            const values = data.map(d => +d[`air_quality_${pollutant}`]).filter(value => !isNaN(value));
+            return {
+                pollutant,
+                max: d3.max(values),
+                min: d3.min(values),
+            };
+        });
         const svg3 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
 
         const barWidth = 40; // Adjust as needed
