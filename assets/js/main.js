@@ -6,14 +6,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Clean and parse the data
         data.forEach(function (d) {
-            // Convert string values to appropriate data types
-            // Add more conversions based on your dataset
 
-            // Note: Adjust attribute names based on your dataset
         });
 
+            const cleanedData = data.filter(row => {
+                // Check if any value in the row is NaN
+                for (const key in row) {
+                    if (isNaN(row[key])) {
+                        return false; // Exclude the row if NaN is found
+                    }
+                }
+                return true; // Include the row if no NaN is found
+            });
+            
+            console.log(cleanedData);
+
         // Visualization 1: Average Air Quality Index by Country (Bar Chart)
-        const groupedData = d3.group(data, d => d.country);
+        const groupedData = d3.group(cleanedData, d => d.country);
         const averages = Array.from(groupedData, ([key, values]) => ({
             country: key,
             avgAirQuality: d3.mean(values, d => +d.air_quality_us_epa_index),
@@ -35,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const svg2 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
 
         svg2.selectAll("circle")
-            .data(data)
+            .data(cleanedData)
             .enter()
             .append("circle")
             .filter(d => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us_epa_index))
@@ -47,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Visualization 3: Highest and Lowest Levels of Air Pollution
         const pollutants = ["Carbon_Monoxide","PM2.5", "Ozone", "Nitrogen_dioxide", "Sulphur_dioxide", 'PM10'];
         const maxMinData = pollutants.map(pollutant => {
-            const values = data.map(d => +d[`air_quality_${pollutant}`]).filter(value => !isNaN(value));
+            const values = cleanedData.map(d => +d[`air_quality_${pollutant}`]).filter(value => !isNaN(value));
             return {
                 pollutant,
                 max: d3.max(values),
@@ -100,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .y(d => +d.air_quality_us_epa_index);
 
         svg4.append("path")
-            .datum(data)
+            .datum(cleanedData)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
             .attr("stroke-width", 2)
@@ -110,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const directionBins = d3.range(0, 360, 45);
         const speedBins = [0, 5, 10, 15, 20];
 
-        const processedData = d3.rollup(data, v => d3.mean(v, d => +d.air_quality_us_epa_index), d => {
+        const processedData = d3.rollup(cleanedData, v => d3.mean(v, d => +d.air_quality_us_epa_index), d => {
             const directionBin = directionBins.find(bin => d.wind_direction < bin);
             const speedBin = speedBins.find(bin => d.wind_mph < bin);
             return `${directionBin}-${speedBin}`;
