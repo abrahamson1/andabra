@@ -39,14 +39,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .data(data)
             .enter()
             .append("circle")
-            .attr("cx", d => +d.temperature_celsius * 10)
+            .attr("cx", d => +d.temperature_fahrenheit * 10)
             .attr("cy", d => +d.air_quality_us_epa_index * 5)
             .attr("r", 5)
             .attr("fill", "red");
 
         // Visualization 3: Highest and Lowest Levels of Air Pollution
         const pollutants = ["Carbon_Monoxide","PM2.5", "Ozone", "Nitrogen_dioxide", "Sulphur_dioxide", 'PM10'];
-
         const maxMinData = pollutants.map(pollutant => ({
             pollutant,
             max: d3.max(data, d => +d[`air_quality_${pollutant}`]),
@@ -70,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .domain(["max", "min"])
             .range(["#FF5733", "#33B5FF"]);
 
-        svg.selectAll(".barGroup")
+        svg3.selectAll(".barGroup")
             .data(maxMinData)
             .enter()
             .append("g")
@@ -97,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .x(d => new Date(d.time)) // Use the appropriate x-axis scale
             .y(d => +d.air_quality_us_epa_index);
 
-        svg.append("path")
+        svg4.append("path")
             .datum(data)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
@@ -107,20 +106,38 @@ document.addEventListener("DOMContentLoaded", function () {
         // Visualization 5: Air Quality Patterns Based on Wind Direction or Speed (Heatmap)
         const directionBins = d3.range(0, 360, 45);
         const speedBins = [0, 5, 10, 15, 20];
-        
+
         const processedData = d3.rollup(data, v => d3.mean(v, d => +d.air_quality_us_epa_index), d => {
-          const directionBin = directionBins.find(bin => d.wind_direction < bin);
-          const speedBin = speedBins.find(bin => d.wind_mph < bin);
-          return `${directionBin}-${speedBin}`;
+            const directionBin = directionBins.find(bin => d.wind_direction < bin);
+            const speedBin = speedBins.find(bin => d.wind_mph < bin);
+            return `${directionBin}-${speedBin}`;
         });
-        
-        // Create a heatmap
-        const heatmap = d3.heatmap();
-        
-        const svg5 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
-        
-        svg.datum(processedData)
-          .call(heatmap);;
+
+        // Set up dimensions for the heatmap
+        const cellSize = 50;
+        const width = directionBins.length * cellSize;
+        const height = speedBins.length * cellSize;
+
+        // Create the heatmap
+        const heatmap = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .selectAll("rect")
+            .data(processedData)
+            .enter().append("rect")
+            .attr("x", d => directionBins.indexOf(+d[0].split("-")[0]) * cellSize)
+            .attr("y", d => speedBins.indexOf(+d[0].split("-")[1]) * cellSize)
+            .attr("width", cellSize)
+            .attr("height", cellSize)
+            .style("fill", d => colorScale(d[1]));
+
+        // Add axes if needed
+        const xAxis = d3.axisBottom().scale(d3.scaleBand().domain(directionBins).range([0, width]));
+        const yAxis = d3.axisLeft().scale(d3.scaleBand().domain(speedBins).range([0, height]));
+
+        d3.select("body").append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
+        d3.select("body").append("g").call(yAxis);
 
     }).catch(function (error) {
         console.error("Error loading the CSV file:", error);
