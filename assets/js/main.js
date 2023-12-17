@@ -1,9 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Load and parse the CSV data
     d3.csv("GlobalWeatherRepository.csv").then(function (data) {
-        // Log the loaded data to the console to verify
-        console.log(data);
-
         // Clean and parse the data
         const cleanedData = data.filter(row => {
             // Check if any value in the row is NaN
@@ -14,8 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             return true; // Include the row if no NaN is found
         });
-
-        console.log(cleanedData);
 
         // Visualization 1: Average Air Quality Index by Country (Bar Chart)
         const groupedData = d3.group(cleanedData, d => d.country);
@@ -156,12 +151,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const xAxis = d3.axisBottom().scale(d3.scaleBand().domain(directionBins).range([0, width]));
         const yAxis = d3.axisLeft().scale(d3.scaleBand().domain(speedBins).range([0, height]));
 
-        d3.select("body").append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
-        d3.select("body").append("g").call(yAxis);
+        d3.select("#visualization5").append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
+        d3.select("#visualization5").append("g").call(yAxis);
 
         // Add axis labels and titles for visualization 5
-        addAxisLabels(svg5, width / 2, height - 10, "Wind Direction", "Wind Speed");
-        addChartTitle(svg5, width / 2, 30, "Air Quality Patterns Based on Wind Direction or Speed");
+        addAxisLabels(d3.select("#visualization5"), width / 2, height - 10, "Wind Direction", "Wind Speed");
+        addChartTitle(d3.select("#visualization5"), width / 2, 30, "Air Quality Patterns Based on Wind Direction or Speed");
 
     }).catch(function (error) {
         console.error("Error loading the CSV file:", error);
