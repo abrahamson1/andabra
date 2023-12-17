@@ -5,21 +5,17 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(data);
 
         // Clean and parse the data
-        data.forEach(function (d) {
-
+        const cleanedData = data.filter(row => {
+            // Check if any value in the row is NaN
+            for (const key in row) {
+                if (isNaN(row[key])) {
+                    return false; // Exclude the row if NaN is found
+                }
+            }
+            return true; // Include the row if no NaN is found
         });
 
-            const cleanedData = data.filter(row => {
-                // Check if any value in the row is NaN
-                for (const key in row) {
-                    if (isNaN(row[key])) {
-                        return false; // Exclude the row if NaN is found
-                    }
-                }
-                return true; // Include the row if no NaN is found
-            });
-            
-            console.log(cleanedData);
+        console.log(cleanedData);
 
         // Visualization 1: Average Air Quality Index by Country (Bar Chart)
         const groupedData = d3.group(cleanedData, d => d.country);
@@ -28,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
             avgAirQuality: d3.mean(values, d => +d.air_quality_us_epa_index),
         }));
 
-        const svg1 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
+        const svg1 = d3.select("#visualization1").append("svg").attr("width", 600).attr("height", 400);
 
         svg1.selectAll("rect")
             .data(averages)
@@ -40,8 +36,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", d => d.avgAirQuality * 10)
             .attr("fill", "blue");
 
+        // Add axis labels and titles for visualization 1
+        addAxisLabels(svg1, 300, 380, "Country", "Average Air Quality Index");
+        addChartTitle(svg1, 300, 30, "Average Air Quality Index by Country");
+
         // Visualization 2: Correlation between Temperature and Air Quality (Scatter Plot)
-        const svg2 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
+        const svg2 = d3.select("#visualization2").append("svg").attr("width", 600).attr("height", 400);
 
         svg2.selectAll("circle")
             .data(cleanedData)
@@ -53,8 +53,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("r", 5)
             .attr("fill", "red");
 
+        // Add axis labels and titles for visualization 2
+        addAxisLabels(svg2, 300, 380, "Temperature (Celsius)", "Air Quality Index");
+        addChartTitle(svg2, 300, 30, "Correlation between Temperature and Air Quality");
+
         // Visualization 3: Highest and Lowest Levels of Air Pollution
-        const pollutants = ["Carbon_Monoxide","PM2.5", "Ozone", "Nitrogen_dioxide", "Sulphur_dioxide", 'PM10'];
+        const pollutants = ["Carbon_Monoxide", "PM2.5", "Ozone", "Nitrogen_dioxide", "Sulphur_dioxide", 'PM10'];
         const maxMinData = pollutants.map(pollutant => {
             const values = cleanedData.map(d => +d[`air_quality_${pollutant}`]).filter(value => !isNaN(value));
             return {
@@ -63,10 +67,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 min: d3.min(values),
             };
         });
-        const svg3 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
+        const svg3 = d3.select("#visualization3").append("svg").attr("width", 600).attr("height", 400);
 
-        const barWidth = 40; // Adjust as needed
-        const barPadding = 10; // Adjust as needed
+        const barWidth = 40;
+        const barPadding = 10;
         const groupWidth = barWidth * pollutants.length + barPadding * (pollutants.length - 1);
 
         const xScale = d3.scaleBand()
@@ -97,12 +101,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", d => 400 - yScale(d))
             .attr("fill", (d, i) => colorScale(i === 0 ? "max" : "min"));
 
-        // Visualization 4: Air Quality Trend Over Time (Line Chart)
-        // Sort data by time
-        data.sort((a, b) => d3.ascending(a.time, b.time));
+        // Add axis labels and titles for visualization 3
+        addAxisLabels(svg3, 300, 380, "Pollutants", "Air Quality Level");
+        addChartTitle(svg3, 300, 30, "Highest and Lowest Levels of Air Pollution");
 
-        // Create a line chart
-        const svg4 = d3.select("body").append("svg").attr("width", 600).attr("height", 400);
+        // Visualization 4: Air Quality Trend Over Time (Line Chart)
+        cleanedData.sort((a, b) => d3.ascending(a.time, b.time));
+        const svg4 = d3.select("#visualization4").append("svg").attr("width", 600).attr("height", 400);
 
         const line = d3.line()
             .x(d => new Date(d.time)) // Use the appropriate x-axis scale
@@ -115,10 +120,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("stroke-width", 2)
             .attr("d", line);
 
+        // Add axis labels and titles for visualization 4
+        addAxisLabels(svg4, 300, 380, "Time", "Air Quality Index");
+        addChartTitle(svg4, 300, 30, "Air Quality Trend Over Time");
+
         // Visualization 5: Air Quality Patterns Based on Wind Direction or Speed (Heatmap)
         const directionBins = d3.range(0, 360, 45);
         const speedBins = [0, 5, 10, 15, 20];
-
         const processedData = d3.rollup(cleanedData, v => d3.mean(v, d => +d.air_quality_us_epa_index), d => {
             const directionBin = directionBins.find(bin => d.wind_direction < bin);
             const speedBin = speedBins.find(bin => d.wind_mph < bin);
@@ -131,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const height = speedBins.length * cellSize;
 
         // Create the heatmap
-        const heatmap = d3.select("body")
+        const heatmap = d3.select("#visualization5")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -151,7 +159,35 @@ document.addEventListener("DOMContentLoaded", function () {
         d3.select("body").append("g").attr("transform", `translate(0, ${height})`).call(xAxis);
         d3.select("body").append("g").call(yAxis);
 
+        // Add axis labels and titles for visualization 5
+        addAxisLabels(svg5, width / 2, height - 10, "Wind Direction", "Wind Speed");
+        addChartTitle(svg5, width / 2, 30, "Air Quality Patterns Based on Wind Direction or Speed");
+
     }).catch(function (error) {
         console.error("Error loading the CSV file:", error);
     });
+
+    function addAxisLabels(svg, x, y, xAxisLabel, yAxisLabel) {
+        svg.append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("text-anchor", "middle")
+            .text(xAxisLabel);
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -y / 2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text(yAxisLabel);
+    }
+
+    function addChartTitle(svg, x, y, title) {
+        svg.append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text(title);
+    }
 });
