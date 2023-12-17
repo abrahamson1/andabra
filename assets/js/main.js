@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Load and parse the CSV data
-    d3.csv("C:\\Users\\ADrew\\OneDrive - Indiana University\\Visualization_Final\\GlobalWeatherRepository.csv").then(function (data) {
+    d3.csv("GlobalWeatherRepository.csv").then(function (data) {
         // Log the loaded data to the console to verify
         console.log(data);
 
