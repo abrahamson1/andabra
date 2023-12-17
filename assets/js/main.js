@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Clean and parse the data
         data.forEach(function (d) {
             // Convert string values to appropriate data types
-            d.temperature_celsius = +d.temperature_celsius;
             // Add more conversions based on your dataset
 
             // Note: Adjust attribute names based on your dataset
@@ -39,7 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .data(data)
             .enter()
             .append("circle")
-            .attr("cx", d => +d.temperature_fahrenheit * 10)
+            .filter(d => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us_epa_index))
+            .attr("cx", d => +d.temperature_celsius * 10)
             .attr("cy", d => +d.air_quality_us_epa_index * 5)
             .attr("r", 5)
             .attr("fill", "red");
