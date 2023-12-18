@@ -83,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .delay((d, i) => i * 100);
 
 
-
         // Visualization 2: Correlation between Temperature and Air Quality (Scatter Plot)
         const margin2 = { top: 10, right: 30, bottom: 30, left: 60 };
         const width2 = 600 - margin2.left - margin2.right;
