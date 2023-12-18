@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add X axis
         const x2 = d3.scaleLinear()
             .domain([0, 75])
-            .range([0, width2]);
+            .range([0, 75]);
         
         svg2.append("g")
             .attr("transform", `translate(0, ${height2})`)
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add Y axis
         const y2 = d3.scaleLinear()
             .domain([0, 75])
-            .range([height2, 0]);
+            .range([75, 0]);
         
         svg2.append("g")
             .call(d3.axisLeft(y2));
