@@ -71,8 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("x", d => x1(d.country))
             .attr("width", x1.bandwidth())
             .attr("fill", "#69b3a2")
-            .attr("height", d => height1 - y1(0))
-            .attr("y", d => y1(0))
+            .attr("y", height1)  // Set the initial y position to the bottom of the chart
+            .attr("height", 0);  // Set the initial height to 0
 
         // Animation
         svg.selectAll("rect")
