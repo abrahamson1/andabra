@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("fill", "#69b3a2")
         .attr("y", d => y1(d.avgAirQuality))
         .attr("height", d => height1 - y1(d.avgAirQuality));
-        
+
         // Animation
         svg.selectAll("rect")
             .transition()
@@ -150,8 +150,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_fahrenheit) && !isNaN(+d.air_quality_us_epa_index) && i < 50))
             .enter()
             .append("circle")
-            .attr("cx", d => x2(+d.temperature_fahrenheit))
-            .attr("cy", d => y2(+d.air_quality_us_epa_index))
+            .attr("cx", d => x2(+d.air_quality_us_epa_index))
+            .attr("cy", d => y2(+d.temperature_fahrenheit))
             .attr("r", 7)
             .style("fill", "#69b3a2")
             .style("opacity", 0.3)
