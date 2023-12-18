@@ -9,8 +9,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!isNaN(row[key]) && isFinite(row[key])) {
                     // Parse the number as an integer
                     row[key] = parseInt(row[key]);
+                } else {
+                    // Handle missing or invalid numeric values
+                    row[key] = 0;
                 }
-            }           
+            }
             // Check if any value in the row is NaN after conversion
             const allValuesAreNaN = Object.values(row).every(value => isNaN(value));
             return !allValuesAreNaN;
@@ -19,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Visualization 1: Average Air Quality Index by Country (Bar Chart)
         // set the dimensions and margins of the graph
         const margin1 = { top: 10, right: 30, bottom: 90, left: 40 };
-        const width1 = 460 - margin1.left - margin1.right;
+        const width1 = 800 - margin1.left - margin1.right;
         const height1 = 450 - margin1.top - margin1.bottom;
 
         // append the svg object to the body of the page
@@ -33,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const groupedData = d3.group(cleanedData, d => d.country);
 
         const averages = Array.from(groupedData, ([key, values]) => {
-            const avgAirQuality = d3.mean(values, d => +d.air_quality_us_epa_index);
+            const avgAirQuality = d3.mean(values, d => +d.air_quality_us-epa-index);
             return {
                 country: key,
                 avgAirQuality: isNaN(avgAirQuality) ? 0 : avgAirQuality,
@@ -129,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const mousemove = function (event, d) {
             tooltip2
-                .html(`Temperature: ${d.temperature}<br>Air Quality: ${d.airQuality}`)
+                .html(`Temperature: ${+d.temperature_celsius}<br>Air Quality: ${+d.air_quality_us-epa-index}`)
                 .style("left", (event.x) / 2 + "px")
                 .style("top", (event.y) / 2 + "px");
         };
@@ -145,11 +148,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add dots
         svg2.append('g')
             .selectAll("dot")
-            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us_epa_index) && i < 50))
+            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us-epa-index) && i < 50))
             .enter()
             .append("circle")
             .attr("cx", d => x2(+d.temperature_celsius))
-            .attr("cy", d => y2(+d.air_quality_us_epa_index))
+            .attr("cy", d => y2(+d.air_quality_us-epa-index))
             .attr("r", 7)
             .style("fill", "#69b3a2")
             .style("opacity", 0.3)
@@ -338,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
         const directionBins = [...new Set(data.map(d => d.wind_direction))];
-        const speedBins = [...new Set(data.map(d => d.wind_mph))];
+        const speedBins = [...new Set(data.map(d => +d.wind_mph))];
 
         // Build X scales and axis:
         const x = d3.scaleBand()
@@ -366,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Build color scale
         const colorScale = d3.scaleSequential()
             .interpolator(d3.interpolateInferno)
-            .domain([d3.min(data, d => +d.air_quality_us_epa_index), d3.max(data, d => +d.air_quality_us_epa_index)]);
+            .domain([d3.min(data, d => +d.air_quality_us-epa-index), d3.max(data, d => +d.air_quality_us-epa-index)]);
 
         // create a tooltip
         const tooltip5 = d3.select("#visualization5")
@@ -388,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         var mousemove5 = function(d) {                       
             tooltip5
-            .html(`Wind Direction: ${d.wind_direction}<br>Wind Speed: ${d.wind_mph}<br>Air Quality: ${d.air_quality_us_epa_index}`)
+            .html(`Wind Direction: ${d.wind_direction}<br>Wind Speed: ${+d.wind_mph}<br>Air Quality: ${+d.air_quality_us-epa-index}`)
                 .style("left", (d3.mouse(this)[0]+70) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
         }
@@ -406,12 +409,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .enter()
             .append("rect")
             .attr("x", d => x(d.wind_direction))
-            .attr("y", d => y(d.wind_mph))
+            .attr("y", d => y(+d.wind_mph))
             .attr("rx", 4)
             .attr("ry", 4)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
-            .style("fill", d => colorScale(+d.air_quality_us_epa_index))
+            .style("fill", d => colorScale(+d.air_quality_us-epa-index))
             .style("stroke-width", 4)
             .style("stroke", "none")
             .style("opacity", 0.8)
@@ -419,14 +422,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .on("mousemove", mousemove5)
             .on("mouseleave", mouseleave5);
         });
-
-        // Add title to the graph
-        svg5.append("text")
-        .attr("x", 0)
-        .attr("y", -50)
-        .attr("text-anchor", "left")
-        .style("font-size", "22px")
-        .text("Air Quality Patterns Based on Wind Direction or Speed");
     }).catch(function (error) {
         console.error("Error loading the file:", error);
     });
