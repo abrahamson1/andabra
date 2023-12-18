@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Load and parse the CSV data
     d3.csv("GlobalWeatherRepository.csv").then(function (data) {
+        console.log(data); // Check if data is loaded correctly
         // Clean and parse the data
         const cleanedData = data.filter(row => {
             for (const key in row) {
                 // Check if the value is a number
-                if (!isNaN(row[key])) {
+                if (!isNaN(row[key]) && isFinite(row[key])) {
                     // Parse the number as an integer
                     row[key] = parseInt(row[key]);
                 }
@@ -336,8 +337,8 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
-        const directionBins = d3.map(data, function (d) { return d.wind_direction; }).keys();
-        const speedBins = d3.map(data, function (d) { return d.wind_mph; }).keys();
+        const directionBins = [...new Set(data.map(d => d.wind_direction))];
+        const speedBins = [...new Set(data.map(d => d.wind_mph))];
 
         // Build X scales and axis:
         const x = d3.scaleBand()
@@ -426,31 +427,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("text-anchor", "left")
         .style("font-size", "22px")
         .text("Air Quality Patterns Based on Wind Direction or Speed");
-           
-            }).catch(function (error) {
-                console.error("Error loading the file:", error);
-            });
-
-    function addAxisLabels(svg, x, y, xAxisLabel, yAxisLabel) {
-        svg.append("text")
-            .attr("x", x)
-            .attr("y", y)
-            .attr("text-anchor", "middle")
-            .text(xAxisLabel);
-
-        svg.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("x", -y / 2)
-            .attr("y", 20)
-            .attr("text-anchor", "middle")
-            .text(yAxisLabel);
-    }
-
-    function addChartTitle(svg, x, y, title) {
-        svg.append("text")
-            .attr("x", x)
-            .attr("y", y)
-            .attr("text-anchor", "middle")
-            .style("font-size", "16px")
-            .text(title);
-    }
+    }).catch(function (error) {
+        console.error("Error loading the file:", error);
+    });
