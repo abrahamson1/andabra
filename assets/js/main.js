@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const groupedData = d3.group(cleanedData, d => d.country);
 
         const averages = Array.from(groupedData, ([key, values]) => {
-            const avgAirQuality = d3.mean(values, d => +d.air_quality_us-epa-index);
+            const avgAirQuality = d3.mean(values, d => +d.air_quality_us_epa_index);
             return {
                 country: key,
                 avgAirQuality: isNaN(avgAirQuality) ? 0 : avgAirQuality,
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const mousemove = function (event, d) {
             tooltip2
-                .html(`Temperature: ${+d.temperature_celsius}<br>Air Quality: ${+d.air_quality_us-epa-index}`)
+                .html(`Temperature: ${+d.temperature_celsius}<br>Air Quality: ${+d.air_quality_us_epa_index}`)
                 .style("left", (event.x) / 2 + "px")
                 .style("top", (event.y) / 2 + "px");
         };
@@ -148,11 +148,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add dots
         svg2.append('g')
             .selectAll("dot")
-            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us-epa-index) && i < 50))
+            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us_epa_index) && i < 50))
             .enter()
             .append("circle")
             .attr("cx", d => x2(+d.temperature_celsius))
-            .attr("cy", d => y2(+d.air_quality_us-epa-index))
+            .attr("cy", d => y2(+d.air_quality_us_epa_index))
             .attr("r", 7)
             .style("fill", "#69b3a2")
             .style("opacity", 0.3)
@@ -369,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Build color scale
         const colorScale = d3.scaleSequential()
             .interpolator(d3.interpolateInferno)
-            .domain([d3.min(data, d => +d.air_quality_us-epa-index), d3.max(data, d => +d.air_quality_us-epa-index)]);
+            .domain([d3.min(data, d => +d.air_quality_us_epa_index), d3.max(data, d => +d.air_quality_us_epa_index)]);
 
         // create a tooltip
         const tooltip5 = d3.select("#visualization5")
@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         var mousemove5 = function(d) {                       
             tooltip5
-            .html(`Wind Direction: ${d.wind_direction}<br>Wind Speed: ${+d.wind_mph}<br>Air Quality: ${+d.air_quality_us-epa-index}`)
+            .html(`Wind Direction: ${d.wind_direction}<br>Wind Speed: ${+d.wind_mph}<br>Air Quality: ${+d.air_quality_us_epa_index}`)
                 .style("left", (d3.mouse(this)[0]+70) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px")
         }
@@ -414,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("ry", 4)
             .attr("width", x.bandwidth())
             .attr("height", y.bandwidth())
-            .style("fill", d => colorScale(+d.air_quality_us-epa-index))
+            .style("fill", d => colorScale(+d.air_quality_us_epa_index))
             .style("stroke-width", 4)
             .style("stroke", "none")
             .style("opacity", 0.8)
