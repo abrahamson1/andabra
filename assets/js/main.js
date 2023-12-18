@@ -66,14 +66,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Bars
         svg.selectAll("mybar")
-            .data(averages)
-            .join("rect")
-            .attr("x", d => x1(d.country))
-            .attr("width", x1.bandwidth())
-            .attr("fill", "#69b3a2")
-            .attr("y", height1)  // Set the initial y position to the bottom of the chart
-            .attr("height", 0);  // Set the initial height to 0
-
+        .data(averages)
+        .join("rect")
+        .attr("x", d => x1(d.country))
+        .attr("width", x1.bandwidth())
+        .attr("fill", "#69b3a2")
+        .attr("y", d => y1(d.avgAirQuality))
+        .attr("height", d => height1 - y1(d.avgAirQuality));
+        
         // Animation
         svg.selectAll("rect")
             .transition()
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Add X axis
         const x2 = d3.scaleLinear()
-            .domain([-20, 75])
+            .domain([-40, 150])
             .range([0, width2]);
         
         svg2.append("g")
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Add Y axis
         const y2 = d3.scaleLinear()
-            .domain([-20, 75])
+            .domain([-40, 150])
             .range([height2, 0]);
         
         svg2.append("g")
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const mousemove = function (event, d) {
             tooltip2
-                .html(`Temperature: ${+d.temperature_celsius}<br>Air Quality: ${+d.air_quality_us_epa_index}`)
+                .html(`Temperature: ${+d.temperature_fahrenheit}<br>Air Quality: ${+d.air_quality_us_epa_index}`)
                 .style("left", (event.x) / 2 + "px")
                 .style("top", (event.y) / 2 + "px");
         };
@@ -147,10 +147,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add dots
         svg2.append('g')
             .selectAll("dot")
-            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_celsius) && !isNaN(+d.air_quality_us_epa_index) && i < 50))
+            .data(cleanedData.filter((d, i) => !isNaN(+d.temperature_fahrenheit) && !isNaN(+d.air_quality_us_epa_index) && i < 50))
             .enter()
             .append("circle")
-            .attr("cx", d => x2(+d.temperature_celsius))
+            .attr("cx", d => x2(+d.temperature_fahrenheit))
             .attr("cy", d => y2(+d.air_quality_us_epa_index))
             .attr("r", 7)
             .style("fill", "#69b3a2")
