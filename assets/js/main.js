@@ -99,19 +99,19 @@ document.addEventListener("DOMContentLoaded", function () {
         // Add X axis
         const x2 = d3.scaleLinear()
             .domain([0, 75])
-            .range([0, 75]);
+            .range([0, width2]);
         
         svg2.append("g")
             .attr("transform", `translate(0, ${height2})`)
-            .call(d3.axisBottom(x2));
+            .call(d3.axisBottom(x2).ticks(10));
         
         // Add Y axis
         const y2 = d3.scaleLinear()
             .domain([0, 75])
-            .range([75, 0]);
+            .range([height2, 0]);
         
         svg2.append("g")
-            .call(d3.axisLeft(y2));
+            .call(d3.axisLeft(y2).ticks(10));
         
         // Add a tooltip div
         const tooltip2 = d3.select("#visualization2")
